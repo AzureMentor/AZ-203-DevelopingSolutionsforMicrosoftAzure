@@ -1,4 +1,20 @@
 name: '$(Date:yyyyMMdd)$(Rev:.rr)'
+pr:
+  branches:
+    include:
+    - master
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - readme.md
+    - index.md
+    - lab.md
+    - LICENSE
+    - _config.yml
+    - .github/*
 jobs:
   - job: build_markdown_content
     displayName: 'Build Markdown Content'
@@ -19,6 +35,7 @@ jobs:
             node package.js --version $(Build.BuildNumber)
       - task: GitHubRelease@0
         displayName: 'Create GitHub Release'
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
         inputs:
           gitHubConnection: 'github-microsoftlearning-organization'
           repositoryName: '$(Build.Repository.Name)'
